@@ -1,0 +1,45 @@
+# Binaries and executables
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.bin
+sevima-be/cmd/api/api
+sevima-be/cmd/seed/seed
+
+# Test and coverage artifacts
+*.out
+*.test
+*.prof
+
+# Dependencies
+node_modules/
+sevima-fe/node_modules/
+.pnp
+.pnp.js
+
+# Production build outputs
+dist/
+sevima-fe/dist/
+build/
+
+# Environment files and secrets
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
+!sevima-be/.env.example
+!sevima-fe/.env.example
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS metadata
+.DS_Store
+Thumbs.db
