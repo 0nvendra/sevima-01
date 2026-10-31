@@ -1,0 +1,596 @@
+{
+	"info": {
+		"_postman_id": "b3e04e9c-43f1-4db3-9878-1a52b665fa1a",
+		"name": "SEVIMA-PAY Multi-Tenant UKT Payment API",
+		"description": "Koleksi API resmi untuk SEVIMA-PAY (Go Gin + PostgreSQL + React). Mendukung multi-tenant, autentikasi JWT RBAC, verifikasi HMAC-SHA256 webhook, dan simulator Mock Gateway.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Authentication",
+			"item": [
+				{
+					"name": "Login - Mahasiswa (UGM)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.success && jsonData.data && jsonData.data.access_token) {",
+									"    pm.collectionVariables.set('mhs_token', jsonData.data.access_token);",
+									"    pm.collectionVariables.set('token', jsonData.data.access_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"fauzi@mail.ugm.ac.id\",\n    \"password\": \"Password123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 Login Berhasil",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"fauzi@mail.ugm.ac.id\",\n    \"password\": \"Password123!\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"body": "{\n    \"success\": true,\n    \"message\": \"Login berhasil\",\n    \"data\": {\n        \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n        \"refresh_token\": \"a5d257c292cd132a0b429900cfd1e0861a116e5e11ff19d084213c5a01e61f36\",\n        \"expires_in\": 900,\n        \"user\": {\n            \"id\": \"66666666-6666-6666-6666-666666666666\",\n            \"institusi_id\": \"11111111-1111-1111-1111-111111111111\",\n            \"email\": \"fauzi@mail.ugm.ac.id\",\n            \"full_name\": \"Ahmad Fauzi (Mahasiswa UGM)\",\n            \"role\": \"mahasiswa\",\n            \"is_active\": true,\n            \"created_at\": \"2026-10-30T18:54:56.25547+08:00\",\n            \"updated_at\": \"2026-10-30T18:54:56.25547+08:00\"\n        },\n        \"institution_code\": \"UGM\",\n        \"institution_name\": \"Universitas Gadjah Mada\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Login - Admin Keuangan (UGM)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.success && jsonData.data && jsonData.data.access_token) {",
+									"    pm.collectionVariables.set('admin_token', jsonData.data.access_token);",
+									"    pm.collectionVariables.set('token', jsonData.data.access_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@ugm.ac.id\",\n    \"password\": \"Password123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login - Super Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.success && jsonData.data && jsonData.data.access_token) {",
+									"    pm.collectionVariables.set('superadmin_token', jsonData.data.access_token);",
+									"    pm.collectionVariables.set('token', jsonData.data.access_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"superadmin@sevima.com\",\n    \"password\": \"Password123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh_token\": \"a5d257c292cd132a0b429900cfd1e0861a116e5e11ff19d084213c5a01e61f36\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/refresh",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile (Me)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/auth/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Students & KRS",
+			"item": [
+				{
+					"name": "Get KRS Eligibility Status (Mahasiswa)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{mhs_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/students/krs-status?semester=ganjil&academic_year=2026/2027",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"students",
+								"krs-status"
+							],
+							"query": [
+								{
+									"key": "semester",
+									"value": "ganjil"
+								},
+								{
+									"key": "academic_year",
+									"value": "2026/2027"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 KRS Eligible (Lunas)",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"success\": true,\n    \"message\": \"Status KRS mahasiswa\",\n    \"data\": {\n        \"nim\": \"21/475123/TK/52111\",\n        \"full_name\": \"Ahmad Fauzi (Mahasiswa UGM)\",\n        \"is_eligible_krs\": true,\n        \"unpaid_invoices_count\": 0,\n        \"active_semester\": \"ganjil\",\n        \"active_academic_year\": \"2026/2027\",\n        \"message\": \"Tagihan semester ganjil tahun 2026/2027 telah lunas. Anda dapat mengisi KRS.\"\n    }\n}"
+						},
+						{
+							"name": "200 KRS Belum Lunas",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"success\": true,\n    \"message\": \"Status KRS mahasiswa\",\n    \"data\": {\n        \"nim\": \"21/475123/TK/52111\",\n        \"full_name\": \"Ahmad Fauzi (Mahasiswa UGM)\",\n        \"is_eligible_krs\": false,\n        \"unpaid_invoices_count\": 1,\n        \"active_semester\": \"ganjil\",\n        \"active_academic_year\": \"2026/2027\",\n        \"message\": \"Terdapat 1 tagihan belum terselesaikan. Pelunasan tagihan wajib sebelum pengisian KRS.\"\n    }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "3. Invoices",
+			"item": [
+				{
+					"name": "List Invoices (Admin Keuangan / Mahasiswa)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/invoices?page=1&per_page=10&status=unpaid",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"invoices"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "10"
+								},
+								{
+									"key": "status",
+									"value": "unpaid"
+								},
+								{
+									"key": "semester",
+									"value": "ganjil",
+									"disabled": true
+								},
+								{
+									"key": "academic_year",
+									"value": "2026/2027",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "Fauzi",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 List Invoices Berhasil",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"success\": true,\n    \"message\": \"Daftar tagihan\",\n    \"data\": [\n        {\n            \"id\": \"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa\",\n            \"institusi_id\": \"11111111-1111-1111-1111-111111111111\",\n            \"student_id\": \"88888888-8888-8888-8888-888888888888\",\n            \"invoice_number\": \"INV-2026-UGM-0001\",\n            \"amount\": 7500000,\n            \"status\": \"paid\",\n            \"semester\": \"ganjil\",\n            \"academic_year\": \"2026/2027\",\n            \"due_date\": \"2026-11-29T18:54:56.25547+08:00\",\n            \"paid_at\": \"2026-10-30T18:56:39+08:00\",\n            \"paid_amount\": 7500000,\n            \"payment_method\": \"MANDIRI_VA\",\n            \"notes\": \"Tagihan UKT Semester Ganjil 2026/2027\",\n            \"created_at\": \"2026-10-30T18:54:56.25547+08:00\",\n            \"updated_at\": \"2026-10-30T18:56:39.12345+08:00\",\n            \"student\": {\n                \"id\": \"88888888-8888-8888-8888-888888888888\",\n                \"user_id\": \"00000000-0000-0000-0000-000000000000\",\n                \"institusi_id\": \"00000000-0000-0000-0000-000000000000\",\n                \"nim\": \"21/475123/TK/52111\",\n                \"study_program\": \"Teknik Informatika\",\n                \"enrollment_year\": 0,\n                \"is_active\": false,\n                \"created_at\": \"0001-01-01T00:00:00Z\",\n                \"updated_at\": \"0001-01-01T00:00:00Z\",\n                \"user\": {\n                    \"id\": \"00000000-0000-0000-0000-000000000000\",\n                    \"email\": \"\",\n                    \"full_name\": \"Ahmad Fauzi (Mahasiswa UGM)\",\n                    \"role\": \"\",\n                    \"is_active\": false,\n                    \"created_at\": \"0001-01-01T00:00:00Z\",\n                    \"updated_at\": \"0001-01-01T00:00:00Z\"\n                }\n            }\n        }\n    ],\n    \"meta\": {\n        \"page\": 1,\n        \"per_page\": 10,\n        \"total_records\": 1,\n        \"total_pages\": 1\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Invoice Detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/invoices/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"invoices",
+								"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Invoice (Admin Keuangan)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"student_id\": \"88888888-8888-8888-8888-888888888888\",\n    \"amount\": 8000000,\n    \"semester\": \"genap\",\n    \"academic_year\": \"2026/2027\",\n    \"due_date\": \"2027-02-28\",\n    \"notes\": \"Tagihan UKT Semester Genap 2026/2027\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/invoices",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"invoices"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "201 Created",
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"success\": true,\n    \"message\": \"Tagihan berhasil diterbitkan\",\n    \"data\": {\n        \"id\": \"f1e2d3c4-b5a6-7890-1234-567890abcdef\",\n        \"institusi_id\": \"11111111-1111-1111-1111-111111111111\",\n        \"student_id\": \"88888888-8888-8888-8888-888888888888\",\n        \"invoice_number\": \"INV-123456-2026/2027\",\n        \"amount\": 8000000,\n        \"status\": \"unpaid\",\n        \"semester\": \"genap\",\n        \"academic_year\": \"2026/2027\",\n        \"due_date\": \"2027-02-28T00:00:00Z\",\n        \"paid_at\": null,\n        \"paid_amount\": null,\n        \"payment_method\": null,\n        \"notes\": \"Tagihan UKT Semester Genap 2026/2027\",\n        \"created_at\": \"2026-10-30T19:00:00Z\",\n        \"updated_at\": \"2026-10-30T19:00:00Z\"\n    }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "4. Institutions (Super Admin)",
+			"item": [
+				{
+					"name": "List All Institutions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{superadmin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/institutions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"institutions"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 List Institusi",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"success\": true,\n    \"message\": \"Daftar institusi\",\n    \"data\": [\n        {\n            \"id\": \"22222222-2222-2222-2222-222222222222\",\n            \"code\": \"ITS\",\n            \"name\": \"Institut Teknologi Sepuluh Nopember\",\n            \"address\": \"Sukolilo, Surabaya\",\n            \"phone\": \"031-5994251\",\n            \"email\": \"humas@its.ac.id\",\n            \"is_active\": true,\n            \"created_at\": \"2026-10-30T18:54:56.25547+08:00\",\n            \"updated_at\": \"2026-10-30T18:54:56.25547+08:00\"\n        },\n        {\n            \"id\": \"11111111-1111-1111-1111-111111111111\",\n            \"code\": \"UGM\",\n            \"name\": \"Universitas Gadjah Mada\",\n            \"address\": \"Bulaksumur, Yogyakarta\",\n            \"phone\": \"0274-588688\",\n            \"email\": \"info@ugm.ac.id\",\n            \"is_active\": true,\n            \"created_at\": \"2026-10-30T18:54:56.25547+08:00\",\n            \"updated_at\": \"2026-10-30T18:54:56.25547+08:00\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Create Institution",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{superadmin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"UNAIR\",\n    \"name\": \"Universitas Airlangga\",\n    \"address\": \"Jl. Airlangga 4-6, Surabaya\",\n    \"phone\": \"031-5014896\",\n    \"email\": \"info@unair.ac.id\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/institutions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"institutions"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5. Webhook & Mock Gateway",
+			"item": [
+				{
+					"name": "Mock Gateway: Trigger Simulated Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"institution_code\": \"UGM\",\n    \"invoice_number\": \"INV-2026-UGM-0001\",\n    \"payment_method\": \"MANDIRI_VA\",\n    \"simulate_tamper\": false,\n    \"event_type\": \"payment.success\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/mock-gateway/pay",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"mock-gateway",
+								"pay"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 Pembayaran Sukses Diproses",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"success\": true,\n    \"message\": \"Simulasi pembayaran berhasil dieksekusi\",\n    \"data\": {\n        \"calculated_signature\": \"c621b4edbc9b00bf2f9251f2c2a9ec37d38722642220648a79f6bc77aa4158de\",\n        \"webhook_payload\": {\n            \"institution_code\": \"UGM\",\n            \"event_type\": \"payment.success\",\n            \"invoice_number\": \"INV-2026-UGM-0001\",\n            \"amount\": 7500000,\n            \"payment_method\": \"MANDIRI_VA\",\n            \"paid_at\": \"2026-10-30T18:56:39+08:00\",\n            \"transaction_id\": \"TRX-SIM-1793357799\"\n        },\n        \"webhook_result\": {\n            \"success\": true,\n            \"status\": \"processed\",\n            \"invoice_number\": \"INV-2026-UGM-0001\",\n            \"message\": \"Payment successfully verified and updated\"\n        }\n    }\n}"
+						},
+						{
+							"name": "200 Idempotent Duplicate (Sudah Lunas)",
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"success\": true,\n    \"message\": \"Simulasi pembayaran berhasil dieksekusi\",\n    \"data\": {\n        \"calculated_signature\": \"38133c1361e5c38024582f9cd386d63cecbda5792a112cc5d36de5f8fc359729\",\n        \"webhook_payload\": {\n            \"institution_code\": \"UGM\",\n            \"event_type\": \"payment.success\",\n            \"invoice_number\": \"INV-2026-UGM-0001\",\n            \"amount\": 7500000,\n            \"payment_method\": \"MANDIRI_VA\",\n            \"paid_at\": \"2026-10-30T18:56:48+08:00\",\n            \"transaction_id\": \"TRX-SIM-1793357808\"\n        },\n        \"webhook_result\": {\n            \"success\": true,\n            \"status\": \"duplicate\",\n            \"invoice_number\": \"INV-2026-UGM-0001\",\n            \"message\": \"Invoice already marked as paid (idempotent no-op)\"\n        }\n    }\n}"
+						},
+						{
+							"name": "400 Signature Tampered (Ditolak)",
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"success\": false,\n    \"error\": {\n        \"code\": \"SIMULATION_FAILED\",\n        \"message\": \"invalid signature\",\n        \"details\": {\n            \"calculated_signature\": \"795d42549634399eaf17e793403ae3e21082cf7588e1114870d15d3ab580dead\",\n            \"webhook_payload\": {\n                \"institution_code\": \"UGM\",\n                \"event_type\": \"payment.success\",\n                \"invoice_number\": \"INV-2026-UGM-0001\",\n                \"amount\": 7500000,\n                \"payment_method\": \"MANDIRI_VA\",\n                \"paid_at\": \"2026-10-30T18:56:53+08:00\",\n                \"transaction_id\": \"TRX-SIM-1793357813\"\n            },\n            \"webhook_result\": null\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Direct Webhook (HMAC in Header)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Signature",
+								"value": "c621b4edbc9b00bf2f9251f2c2a9ec37d38722642220648a79f6bc77aa4158de"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"institution_code\": \"UGM\",\n    \"event_type\": \"payment.success\",\n    \"invoice_number\": \"INV-2026-UGM-0001\",\n    \"amount\": 7500000,\n    \"payment_method\": \"MANDIRI_VA\",\n    \"paid_at\": \"2026-10-30T18:56:39+08:00\",\n    \"transaction_id\": \"TRX-SIM-1793357799\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/webhook/payment",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"webhook",
+								"payment"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080/api/v1"
+		},
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "mhs_token",
+			"value": ""
+		},
+		{
+			"key": "admin_token",
+			"value": ""
+		},
+		{
+			"key": "superadmin_token",
+			"value": ""
+		}
+	]
+}
